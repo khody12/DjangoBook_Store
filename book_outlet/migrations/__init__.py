@@ -1,0 +1,1 @@
+# these migrations are needed so that django knows how to update the database when we change our model inside of models.py
