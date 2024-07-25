@@ -7,4 +7,8 @@ class Book(models.Model): #models.Model is supplied by django to us.
     #Not for something that is multiple book pages
     rating = models.IntegerField() # integer numbers. 
 
+    def __str__(self): # overriding this function as it basically exists for every python class. it allows us to change how something can be output in the terminal.
+        return f"{self.title} ({self.rating})"
+
+
 
