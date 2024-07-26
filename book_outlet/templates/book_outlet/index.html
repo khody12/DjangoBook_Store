@@ -7,9 +7,12 @@
 {% block content %}
   <ul>
     {% for book in books%}
+      <a href ="{{book.get_absolute_url}}"> <!--We have a method inside of our book class which will return the absolute url. we can also use the url tag as per usual, but heres another way-->
+      
       <li>
         {{book.title}} (Rating: {{book.rating}})
       </li>
+      </a>
       {%endfor%}
   </ul>
 {%endblock%}
