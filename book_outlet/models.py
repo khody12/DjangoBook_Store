@@ -12,7 +12,9 @@ class Book(models.Model): #models.Model is supplied by django to us.
     author = models.CharField(null=True, max_length=100) # these two new fields, author and is_bestselling were added after we make initial migrations, this means we have to set default values for them,
     is_bestselling = models.BooleanField(default=False) # the sql datatable doesnt allow for empty values, (null is okay even though not optimal) 
     #we have to have some default if were adding on new attributes after making migrations. or we could say blank=True and allow blank values.
-    slug = models.SlugField(default="",null=False) # this will slugify whatever is passed in. 
+    slug = models.SlugField(default="",null=False, db_index=True) # this will slugify whatever is passed in. 
+    
+    #we can improve the performance of the find operation by making an index for some of our attributes. db_index = database index. Use this for attributes that you will very often need to fetch.
 
     def get_absolute_url(self):
         return reverse("book", args=[self.id])
