@@ -4,12 +4,18 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 # Create your models here.
+class Author(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
 
 class Book(models.Model): #models.Model is supplied by django to us. 
     title = models.CharField(max_length=50)  # you get the value types from the models module. # charfield is used for small to large-sized strings. have to set 
     #Not for something that is multiple book pages
     rating = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)]) # integer numbers. 
-    author = models.CharField(null=True, max_length=100) # these two new fields, author and is_bestselling were added after we make initial migrations, this means we have to set default values for them,
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True) # ForeignKey() tells us that author is a pointer at an entry within the Author Model. 
+    #^^^^on_delete parameter necessary because if an author is deleted, we need to know what happens to the book that is related to the author
+    #cascade would affect all related models. protect would avoid deleting related models.
+
     is_bestselling = models.BooleanField(default=False) # the sql datatable doesnt allow for empty values, (null is okay even though not optimal) 
     #we have to have some default if were adding on new attributes after making migrations. or we could say blank=True and allow blank values.
     slug = models.SlugField(default="",null=False, db_index=True) # this will slugify whatever is passed in. 
@@ -27,6 +33,8 @@ class Book(models.Model): #models.Model is supplied by django to us.
         self.slug = slugify(self.title)
 
         super().save(*args, **kwargs)
+
+
 
 
 
