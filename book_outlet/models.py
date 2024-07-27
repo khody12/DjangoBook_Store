@@ -4,15 +4,31 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 # Create your models here.
+class Address(models.Model): #THIS WILL BE A ONE TO ONE RELATION.
+    street = models.CharField(max_length=80)
+    postal_code = models.CharField(max_length=5)
+    city = models.CharField(max_length=50)
+    
+
 class Author(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+    Address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True)   # ForeignKey() is used for a one-to-many relation, while OneToOneField is obviously one to one.
+    #null=True will allow us to make the migrations. we will initially get an error because we don't have a default value and we have existing data that doesnt have an address tied to author.
+    #null=True is basically allowing this field to be set to null. 
+
+    def full_name(self):
+        return self.first_name + " " + self.last_name
+
+    def __str__(self):
+        return self.full_name()
 
 class Book(models.Model): #models.Model is supplied by django to us. 
     title = models.CharField(max_length=50)  # you get the value types from the models module. # charfield is used for small to large-sized strings. have to set 
     #Not for something that is multiple book pages
     rating = models.IntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)]) # integer numbers. 
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True) # ForeignKey() tells us that author is a pointer at an entry within the Author Model. 
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True,related_name="books") # ForeignKey() tells us that author is a pointer at an entry within the Author Model. ONE-TO-MANY RELATION <------------ 
     #^^^^on_delete parameter necessary because if an author is deleted, we need to know what happens to the book that is related to the author
     #cascade would affect all related models. protect would avoid deleting related models.
 
@@ -27,12 +43,6 @@ class Book(models.Model): #models.Model is supplied by django to us.
 
     def __str__(self): # overriding this function as it basically exists for every python class. it allows us to change how something can be output in the terminal.
         return f"{self.title} ({self.rating})"
-    def save(self, *args, **kwargs): #*args and **kwargs is used when we dont know how many arguments are going to be passed in. *args handles all positional arguments and will put the arguments in a tuple.
-        #**kwargs will handle all keywords, so things like title="sometitle", name="somename". these arguments will be put into a dictionary. this is important for something like overriding the save function
-        #because we may have more arguments to save in the future if we update our model.
-        self.slug = slugify(self.title)
-
-        super().save(*args, **kwargs)
 
 
 
